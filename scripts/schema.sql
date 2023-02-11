@@ -40,6 +40,7 @@ CREATE SCHEMA orderbook;
 CREATE TABLE orderbook.detail(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     created TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    account UUID NOT NULL REFERENCES users.account,
     symbol TEXT NOT NULL,
     type transaction_type NOT NULL,
     quantity INTEGER NOT NULL,
