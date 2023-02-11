@@ -1,3 +1,4 @@
+CREATE TYPE account_type AS ENUM ('admin', 'user');
 CREATE TYPE kyc_type AS ENUM ('aadhar', 'pan');
 CREATE TYPE transaction_type AS ENUM ('buy', 'sell');
 
@@ -7,6 +8,7 @@ DROP SCHEMA IF EXISTS users CASCADE;
 CREATE SCHEMA users;
 CREATE TABLE IF NOT EXISTS users.account(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    type account_type NOT NULL DEFAULT 'user',
     created TIMESTAMP WITH TIME ZONE DEFAULT now(),
     email TEXT NOT NULL UNIQUE,
     contact TEXT NOT NULL,
