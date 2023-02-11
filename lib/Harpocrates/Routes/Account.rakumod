@@ -144,6 +144,18 @@ sub account-routes(
         }
     }
 
+    #| get-transactions returns all user transactions.
+    sub get-transactions(Str $account-id) {
+        my $connection = $pool.get-connection();
+        LEAVE .dispose with $connection;
+
+        my $sth = $connection.execute(
+            'SELECT created, type, symbol, quantity, price
+                 FROM users.transaction WHERE account = ?;', $account-id
+        );
+        return $sth.allrows(:array-of-hash).eager;
+    }
+
     route {
         get -> 'verify', Str :$token! {
             my %res;
@@ -161,6 +173,10 @@ sub account-routes(
         }
         get -> NotLoggedIn $session, 'profile' {
             response.status = 401;
+        }
+
+        get -> LoggedIn $session, 'transactions' {
+            content 'application/json', get-transactions($session.id);
         }
 
         post -> LoggedIn $session, 'kyc', 'aadhar' {
