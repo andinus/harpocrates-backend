@@ -26,7 +26,9 @@ CREATE TABLE IF NOT EXISTS users.kyc(
     created TIMESTAMP WITH TIME ZONE DEFAULT now(),
     type kyc_type NOT NULL,
     id TEXT NOT NULL,
-    image UUID NOT NULL UNIQUE DEFAULT gen_random_uuid()
+    image UUID NOT NULL UNIQUE DEFAULT gen_random_uuid(),
+
+    UNIQUE (account, type)
 );
 CREATE TABLE IF NOT EXISTS users.transaction(
     account UUID NOT NULL REFERENCES users.account,
