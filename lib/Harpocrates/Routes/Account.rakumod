@@ -157,6 +157,7 @@ sub account-routes(
                     if %user<verified>.defined {
                         $session.verified = True;
                         $session.id = %user<id>;
+                        $session.type = %user<type>;
                         response.status = 204;
                     } else {
                         response.status = 401;
