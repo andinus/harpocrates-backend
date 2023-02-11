@@ -175,11 +175,10 @@ sub account-routes(
             request-body -> (:$email!, :$contact!, :$password!, *%) {
                 # res holds the response that is sent.
                 my %res;
-                %res<errors>.push("Password too short.") unless $password.chars > 6;
-                %res<errors>.push("Invalid Email.") unless $email-validate.validate($email);
 
-                with %res<errors> {
+                if not $email-validate.validate($email) {
                     response.status = 400;
+                    %res<message> = "Invalid Email.";
                 } else {
                     my Str $token = create-user-account($email, $contact, $password);
 
