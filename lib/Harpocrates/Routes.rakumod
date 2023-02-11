@@ -13,6 +13,9 @@ sub routes(
         get -> 'ping' {
             content 'text/plain', "pong";
         }
+        get -> 'life' {
+            response.status = 404;
+        }
 
         include account => account-routes(%config, $pool);
         include trading => trading-routes(%config, $pool);
