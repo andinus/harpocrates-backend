@@ -21,10 +21,6 @@ CREATE TABLE IF NOT EXISTS resource.media(
     uploaded_by UUID NOT NULL REFERENCES users.account,
     created TIMESTAMP WITH TIME ZONE DEFAULT now(),
     deleted TIMESTAMP WITH TIME ZONE,
-    -- i'm not sure if this is a good idea (storing as bigint). also,
-    -- the size here might not indicate the true size, actual size
-    -- might be less than this.
-    size bigint,
     details JSONB,
     resolution TEXT,
     file_key UUID UNIQUE DEFAULT gen_random_uuid()
