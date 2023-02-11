@@ -8,6 +8,7 @@ use DBIish::Pool;
 
 use Harpocrates::Config;
 use Harpocrates::Routes;
+use Harpocrates::Trading;
 use Harpocrates::Session;
 
 sub MAIN() is export {
@@ -25,6 +26,15 @@ sub MAIN() is export {
             password => %config<database><pass>,
         )
     );
+
+    # Settle orders every x seconds.
+    start {
+        loop {
+            put "[settle-orders] {DateTime.now}";
+            settle-orders(%config, $pool);
+            sleep %config<settle-sleep>;
+        }
+    }
 
     my Cro::Service $http = Cro::HTTP::Server.new(
         http => <1.1>,
