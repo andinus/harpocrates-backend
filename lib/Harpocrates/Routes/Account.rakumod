@@ -122,6 +122,13 @@ sub account-routes(
             content 'application/json', %res;
         }
 
+        get -> NotLoggedIn $session, 'profile' {
+            response.status = 401;
+        }
+        get -> LoggedIn $session, 'profile' {
+            content 'application/json', %(email => $session.email);
+        }
+
         post -> Harpocrates::Session $session, 'login' {
             request-body -> (:$email!, :$password!, *%) {
                 my %res;
