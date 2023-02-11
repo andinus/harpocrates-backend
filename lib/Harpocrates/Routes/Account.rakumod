@@ -37,7 +37,7 @@ sub account-routes(
 
         $t.in-transaction: -> $dbh {
             my $account = $dbh.execute(
-                'INSERT INTO users.account (email, contact, password) VALUES (?, ?)
+                'INSERT INTO users.account (email, contact, password) VALUES (?, ?, ?)
                      RETURNING id;',
                 $email, $contact, sodium-hash($password)
             );
@@ -102,7 +102,7 @@ sub account-routes(
 
             # If user was verified then add timestamp.
             $dbh.execute(
-                'UPDATE account SET verified = ? WHERE id = ?;',
+                'UPDATE users.account SET verified = ? WHERE id = ?;',
                 DateTime.now, $sth.row(:hash)<account>
             ) if $verified;
         }
@@ -128,7 +128,7 @@ sub account-routes(
                 my %user = get-user($email);
                 # Only verified users will be able to login.
                 if %user<id>.defined && sodium-verify(%user<password>, $password) {
-                    $session.email= %user<email>;
+                    $session.email = $email;
 
                     # Set user-id only if the user account is
                     # verified.
@@ -150,7 +150,7 @@ sub account-routes(
         }
 
         post -> Harpocrates::Session $session, 'register' {
-            request-body -> (:$email!, :$password!, *%) {
+            request-body -> (:$email!, :$contact!, :$password!, *%) {
                 # res holds the response that is sent.
                 my %res;
                 %res<errors>.push("Password too short.") unless $password.chars > 6;
@@ -159,7 +159,7 @@ sub account-routes(
                 with %res<errors> {
                     response.status = 400;
                 } else {
-                    my Str $token = create-user-account($email, $password);
+                    my Str $token = create-user-account($email, $contact, $password);
 
                     try {
                         start send-verification-email($email, $token);

@@ -1,7 +1,7 @@
 use Cro::HTTP::Auth;
 
 class Harpocrates::Session does Cro::HTTP::Auth {
-    has Int $.id is rw;
+    has Str $.id is rw;
     has Str $.email is rw;
     has Bool $.verified is rw;
 
