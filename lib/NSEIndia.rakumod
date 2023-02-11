@@ -24,10 +24,19 @@ class NSEIndia is export {
         my $parser = CSV::Parser.new( file_handle => $fh, contains_header_row => True );
         my %data;
         while %data = %($parser.get_line()) {
-            push @!bonds, %(
-                symbol => %data{"SYMBOL \n"},
-                series => %data{"SERIES \n"}
-            );
+            @!bonds.push: %(
+                SYMBOL => .<SYMBOL>,
+                SERIES => .<SERIES>,
+                LTP => .<LTP>,
+                VALUE => .<VALUE>,
+                '%CHNG' => .<%CHNG>,
+                'BOND TYPE' => .{"BOND TYPE"},
+                'COUPON RATE' => .{"COUPON RATE"},
+                'FACE VALUE' => .{"FACE VALUE"},
+                'VOLUME (Shares)' => .{"VOLUME (Shares)"},
+                'CREDIT RATING' => .{"CREDIT RATING"},
+                'MATURITY DATE' => .{"MATURITY DATE"}
+            ) with %data;
         }
 
         # Initialize the client.
