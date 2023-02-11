@@ -1,9 +1,15 @@
 use Cro::HTTP::Client;
 use Cro::HTTP::Client::CookieJar;
 
+use CSV::Parser;
+
 class NSEIndia is export {
     has Str $!base-url = "https://www.nseindia.com";
     has Str $!legacy-base-url = "https://www1.nseindia.com";
+
+    # bonds contains list of all bonds symbol. This is a static list
+    # set in TWEAK.
+    has Hash @!bonds;
 
     has Cro::HTTP::Client $!client;
     has Cro::HTTP::Client::CookieJar $!jar;
@@ -11,6 +17,19 @@ class NSEIndia is export {
     #| TWEAK gets cookies required to call NSE India APIs and
     #| initialises a client.
     submethod TWEAK() {
+        # Set @!bonds.
+        my $fh = open %?RESOURCES<MW-Bonds-on-CM-11-Feb-2023.csv>, :r;
+        LEAVE .close with $fh;
+
+        my $parser = CSV::Parser.new( file_handle => $fh, contains_header_row => True );
+        my %data;
+        while %data = %($parser.get_line()) {
+            push @!bonds, %(
+                symbol => %data{"SYMBOL \n"},
+                series => %data{"SERIES \n"}
+            );
+        }
+
         # Initialize the client.
         $!client =  Cro::HTTP::Client.new:
                     # creating with cookie-jar, sends cookies on
@@ -31,5 +50,10 @@ class NSEIndia is export {
     method get-details(Str $symbol) {
         my $resp = await $!client.get: ($!base-url ~ '/api/quote-equity?symbol=' ~ $symbol);
         return await $resp.body;
+    }
+
+    #| bonds is a getter function for @!bonds.
+    method bonds(--> List) {
+        return @!bonds;
     }
 }
