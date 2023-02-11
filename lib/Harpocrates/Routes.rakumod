@@ -23,10 +23,10 @@ sub routes(
         return (|('a'..'z'), |(1..9), |('A'..'Z')).roll(72).join;
     }
 
-    #| create-user-account takes email, password and creates a user
-    #| account and also generates a verification token, sends
+    #| create-user-account takes email, contact, password and creates a
+    #| user account and also generates a verification token, sends
     #| verification email.
-    sub create-user-account(Str $email, Str $password --> Str) {
+    sub create-user-account(Str $email, Str $contact, Str $password --> Str) {
         my $connection = $pool.get-connection();
         LEAVE .dispose with $connection;
 
@@ -37,8 +37,9 @@ sub routes(
 
         $t.in-transaction: -> $dbh {
             my $account = $dbh.execute(
-                'INSERT INTO users.account (email, password) VALUES (?, ?) RETURNING id;',
-                $email, sodium-hash($password)
+                'INSERT INTO users.account (email, contact, password) VALUES (?, ?)
+                     RETURNING id;',
+                $email, $contact, sodium-hash($password)
             );
 
             # Save token to database.
@@ -49,6 +50,19 @@ sub routes(
             $token = $sth.row(:hash)<token>;
         }
         return $token;
+    }
+
+    #| get-user takes email returns password, id, verified columns for
+    #| the user.
+    sub get-user(Str $email --> Hash) {
+        my $connection = $pool.get-connection();
+        LEAVE .dispose with $connection;
+
+        my $sth = $connection.execute(
+            'SELECT id, password, verified FROM users.account WHERE email = ?;',
+            $email
+        );
+        return $sth.row(:hash);
     }
 
     #| send-verification-email takes email, token and sents the user a
@@ -110,6 +124,33 @@ sub routes(
                 %res<message> = "Invalid token, Email not verified."
             }
             content 'application/json', %res;
+        }
+
+        post -> VirtualBlue::Session $session, 'account', 'login' {
+            request-body -> (:$email!, :$password!, *%) {
+                my %res;
+                my %user = get-user($email);
+                # Only verified users will be able to login.
+                if %user<id>.defined && sodium-verify(%user<password>, $password) {
+                    $session.email= %user<email>;
+
+                    # Set user-id only if the user account is
+                    # verified.
+                    if %user<verified>.defined {
+                        $session.verified = True;
+                        $session.id = %user<id>;
+                        response.status = 204;
+                    } else {
+                        response.status = 401;
+                        %res<message> = "Verify your account to continue.";
+                    }
+                } else {
+                    response.status = 401;
+                    %res<message> = "Invalid Credentials";
+                }
+
+                content 'application/json', %res;
+            }
         }
 
         post -> Harpocrates::Session $session, 'account', 'register' {
