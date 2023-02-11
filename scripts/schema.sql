@@ -14,7 +14,8 @@ CREATE TABLE IF NOT EXISTS users.account(
     contact TEXT NOT NULL,
     password TEXT NOT NULL,
     verified TIMESTAMP WITH TIME ZONE, -- email verification
-    kyc BOOLEAN DEFAULT FALSE
+    kyc_verified BOOLEAN DEFAULT FALSE, -- admin verification complete
+    kyc_uploaded BOOLEAN DEFAULT FALSE -- kyc upload complete
 );
 CREATE TABLE IF NOT EXISTS users.verification(
     account UUID NOT NULL REFERENCES users.account,
