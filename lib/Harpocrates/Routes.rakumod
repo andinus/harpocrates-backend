@@ -2,6 +2,7 @@ use Cro::HTTP::Router;
 
 use Harpocrates::Session;
 use Harpocrates::Routes::Account;
+use Harpocrates::Routes::Trading;
 
 #| routes contains all routes.
 sub routes(
@@ -14,5 +15,6 @@ sub routes(
         }
 
         include account => account-routes(%config, $pool);
+        include trading => trading-routes(%config, $pool);
     }
 }
