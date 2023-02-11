@@ -4,16 +4,32 @@ use Cro::HTTP::Log::File;
 use Cro::HTTP::Session::InMemory;
 
 use Net::SMTP;
+use DBIish::Pool;
 
 use Harpocrates::Config;
 use Harpocrates::Routes;
 
 sub MAIN(Bool :$debug) {
+    my %config = config();
+
+    my $pool = DBIish::Pool.new(
+        driver => 'Pg',
+        initial-size => 2,
+        max-connections => 10,
+        min-spare-connections => 2,
+        max-idle-duration => Duration.new(60),
+        |%(
+            database => %config<database><name>,
+            user => %config<database><user>,
+            password => %config<database><pass>,
+        )
+    );
+
     my Cro::Service $http = Cro::HTTP::Server.new(
         http => <1.1>,
         host => "127.0.0.1",
         port => "5400",
-        application => routes(config()),
+        application => routes(%config, $pool),
         before => [
                    Cro::HTTP::Session::InMemory[Harpocrates::Session].new(
                        expiration => Duration.new(60 * 15)
