@@ -21,11 +21,6 @@ sub account-routes(
 
     my IO $image-dir = %*ENV<HOME>.IO.add(%config<cryfs><dir>);
 
-    #| generate-token returns a random token.
-    sub generate-token(--> Str) {
-        return (|('a'..'z'), |(1..9), |('A'..'Z')).roll(72).join;
-    }
-
     #| create-user-account takes email, contact, password and creates a
     #| user account and also generates a verification token, sends
     #| verification email.
