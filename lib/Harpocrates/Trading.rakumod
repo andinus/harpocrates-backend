@@ -86,7 +86,7 @@ sub settle-orders(%config, $pool --> Int) is export {
 
             # If buy order is partially satisfied then update the
             # order book.
-            if $quantity > 0 {
+            if $quantity != $buy<quantity> {
                 $dbh.execute(
                     'UPDATE orderbook.detail SET quantity = ? WHERE id = ?;',
                     $quantity, $buy<id>
