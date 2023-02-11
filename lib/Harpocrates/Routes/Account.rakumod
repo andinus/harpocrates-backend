@@ -71,7 +71,7 @@ sub account-routes(
         LEAVE .dispose with $connection;
 
         my $sth = $connection.execute(
-            'SELECT email, contact, kyc_verified, kyc_uploaded
+            'SELECT email, contact, kyc_verified, kyc_uploaded, type
                  FROM users.account WHERE id = ?;',
             $id
         );
