@@ -71,7 +71,8 @@ sub account-routes(
         LEAVE .dispose with $connection;
 
         my $sth = $connection.execute(
-            'SELECT email, contact, kyc FROM users.account WHERE id = ?;',
+            'SELECT email, contact, kyc_verified, kyc_uploaded
+                 FROM users.account WHERE id = ?;',
             $id
         );
         return $sth.row(:hash);
