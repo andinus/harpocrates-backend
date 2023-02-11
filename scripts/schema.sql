@@ -1,9 +1,8 @@
-CREATE TYPE resource_type AS ENUM (
-    'aadhar-proof', 'pan-proof'
+CREATE TYPE kyc_type AS ENUM (
+    'aadhar', 'pan'
 );
 
 DROP SCHEMA IF EXISTS users CASCADE;
-DROP SCHEMA IF EXISTS resource CASCADE;
 
 -- user schema
 CREATE SCHEMA users;
@@ -13,23 +12,18 @@ CREATE TABLE IF NOT EXISTS users.account(
     email TEXT NOT NULL UNIQUE,
     contact TEXT NOT NULL,
     password TEXT NOT NULL,
-    verified TIMESTAMP WITH TIME ZONE
+    verified TIMESTAMP WITH TIME ZONE, -- email verification
+    kyc BOOLEAN DEFAULT FALSE
 );
 CREATE TABLE IF NOT EXISTS users.verification(
     account UUID NOT NULL REFERENCES users.account,
     created TIMESTAMP WITH TIME ZONE DEFAULT now(),
     token UUID NOT NULL DEFAULT gen_random_uuid()
 );
-
--- resource schema
-CREATE SCHEMA resource;
-CREATE TABLE IF NOT EXISTS resource.media(
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    type resource_type NOT NULL,
-    uploaded_by UUID NOT NULL REFERENCES users.account,
+CREATE TABLE IF NOT EXISTS users.kyc(
+    account UUID NOT NULL REFERENCES users.account,
     created TIMESTAMP WITH TIME ZONE DEFAULT now(),
-    deleted TIMESTAMP WITH TIME ZONE,
-    details JSONB,
-    resolution TEXT,
-    file_key UUID UNIQUE DEFAULT gen_random_uuid()
+    type kyc_type NOT NULL,
+    id TEXT NOT NULL,
+    image UUID NOT NULL UNIQUE DEFAULT gen_random_uuid()
 );
