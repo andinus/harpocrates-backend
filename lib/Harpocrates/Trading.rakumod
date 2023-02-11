@@ -3,10 +3,13 @@ use Data::Dump::Tree;
 use DBIish::Transaction;
 
 #| settle-orders runs Price/Time priority aka FIFO algorithm to settle
-#| orders in order book. It moves orders to transactions table.
-sub settle-orders(%config, $pool) is export {
+#| orders in order book. It moves orders to transactions table. It
+#| returns the number of buy orders that were completely settled.
+sub settle-orders(%config, $pool --> Int) is export {
     my $connection = $pool.get-connection();
     LEAVE .dispose with $connection;
+
+    my Int $completed-buy;
 
     # Get buy orders. Only this function works with orderbook. We
     # might add the ability to cancel orders. With this we cannot do
@@ -73,9 +76,11 @@ sub settle-orders(%config, $pool) is export {
                 # and move on.
                 if $quantity == 0 {
                     $dbh.execute('DELETE FROM orderbook.detail WHERE id = ?;', $buy<id>);
+                    $completed-buy++;
                     last SELL;
                 }
             }
         }
     }
+    return $completed-buy;
 }
