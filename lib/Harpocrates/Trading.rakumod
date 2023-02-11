@@ -29,12 +29,14 @@ sub settle-orders(%config, $pool --> Int) is export {
             my Int $quantity = $buy<quantity>;
             my Str $symbol = $buy<symbol>;
 
-            # Match to sell orders from database.
+            # Match to sell orders from database. sell order prices
+            # should be less than buy order limit.
             my $sth = $dbh.execute(
                 'SELECT id, account, symbol, quantity, price, created
                      FROM orderbook.detail WHERE type = \'sell\' AND symbol = ?
+                                           AND price < ?
                      ORDER BY price, created;',
-                $symbol
+                $symbol, $buy<price>
             );
 
             SELL: for $sth.allrows(:array-of-hash) -> $sell {
