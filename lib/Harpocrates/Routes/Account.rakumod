@@ -1,6 +1,7 @@
 use Cro::HTTP::Router;
 use Cro::HTTP::Client;
 
+use MIME::Base64;
 use HTML::Escape;
 use Email::Valid;
 use DBIish::Transaction;
@@ -17,6 +18,8 @@ sub account-routes(
     my $email-client = Cro::HTTP::Client.new(
         auth => { username => "api", password => %config<email><api-key> },
     );
+
+    my IO $image-dir = %*ENV<HOME>.IO.add(%config<cryfs><dir>);
 
     #| generate-token returns a random token.
     sub generate-token(--> Str) {
@@ -124,6 +127,27 @@ sub account-routes(
         return $verified;
     }
 
+    #| update-kyc takes a type, account-id, identity, image and stores
+    #| them on the server. pan detail is as ID proof and aadhar is
+    #| address proof. image is Base64 encoded string.
+    sub update-kyc(Str $type, Str $account-id, Str $identity, $image --> Bool) {
+        my $connection = $pool.get-connection();
+        LEAVE .dispose with $connection;
+
+        my $t = DBIish::Transaction.new(:$connection, :retry);
+        $t.in-transaction: -> $dbh {
+            my $sth = $dbh.execute(
+                'INSERT INTO users.kyc (account, type, id) VALUES (?, ?, ?)
+                     RETURNING image;',
+                $account-id, $type, $identity
+            );
+
+            with $sth.row(:hash)<image> {
+                spurt $image-dir.add($_), MIME::Base64.decode($image);
+            }
+        }
+    }
+
     route {
         get -> 'verify', Str :$token! {
             my %res;
@@ -142,6 +166,16 @@ sub account-routes(
         get -> NotLoggedIn $session, 'profile' {
             response.status = 401;
         }
+
+        post -> LoggedIn $session, 'kyc', 'aadhar' {
+            request-body -> (:$identity, :$image, *%) {
+                update-kyc('aadhar', $session.id, $identity, $image);
+            }
+        }
+        post -> LoggedIn $session, 'kyc', 'pan' {
+            request-body -> (:$identity, :$image, *%) {
+                update-kyc('pan', $session.id, $identity, $image);
+            }
         }
 
         post -> Harpocrates::Session $session, 'login' {
