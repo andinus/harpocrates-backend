@@ -30,8 +30,8 @@ sub MAIN() is export {
     # Settle orders every x seconds.
     start {
         loop {
-            put "[settle-orders] {DateTime.now}";
-            settle-orders(%config, $pool);
+            my Int $completed-buy = settle-orders(%config, $pool);
+            put "[settle-orders] {DateTime.now} {$completed-buy} order(s) completed.";
             sleep %config<settle-sleep>;
         }
     }
