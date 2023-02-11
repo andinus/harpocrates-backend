@@ -8,7 +8,7 @@ use Crypt::SodiumPasswordHash;
 
 use Harpocrates::Session;
 
-#| account-routes contains all account realted routes.
+#| account-routes contains all account related routes.
 sub account-routes(
     %config, #= config contains config options
     $pool, #= get DBIish::Pool

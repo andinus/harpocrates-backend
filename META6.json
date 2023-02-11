@@ -6,16 +6,20 @@
     "authors" : [ "Andinus <andinus@nand.sh>" ],
     "perl" : "6.d",
     "provides" : {
-        "Harpocrates::Web" : "lib/Harpocrates/Web.rakumod"
+        "NSEIndia" : "lib/NSEIndia.rakumod",
+        "Harpocrates::Web" : "lib/Harpocrates/Web.rakumod",
         "Harpocrates::Session" : "lib/Harpocrates/Session.rakumod",
         "Harpocrates::Routes" : "lib/Harpocrates/Routes.rakumod",
+        "Harpocrates::Routes::Account" : "lib/Harpocrates/Routes/Account.rakumod"
     },
     "depends" : [
         "DBIish::Pool"
     ],
     "build-depends" : [ ],
     "test-depends" : [ ],
-    "resources" : [ ],
+    "resources" : [
+        "MW-Bonds-on-CM-11-Feb-2023.csv"
+    ],
     "tags": [
         "Harpocrates"
     ],
