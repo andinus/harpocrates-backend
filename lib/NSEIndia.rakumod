@@ -16,7 +16,7 @@ class NSEIndia is export {
     has %!bond-symbol;
 
     #| cache-dir stores cache of equity details.
-    has IO $!cache-dir = "/tmp/harpocrates-equity-cache".IO;
+    has IO $!cache-dir = "/tmp/harpocrates-cache".IO;
 
     has Cro::HTTP::Client $!client;
     has Cro::HTTP::Client::CookieJar $!jar;
@@ -26,6 +26,7 @@ class NSEIndia is export {
     submethod TWEAK() {
         # Make sure cache-dir exists.
         mkdir $!cache-dir;
+        mkdir $!cache-dir.add("equity");
         die "Cache directory doesn't exist" unless $!cache-dir.d;
 
         # Set @!bonds.
@@ -36,7 +37,7 @@ class NSEIndia is export {
         my %data;
         while %data = %($parser.get_line()) {
             # Add symbol to bond-symbol.
-            %!bond-symbol{%data<SYMBOL>} = True;
+             %!bond-symbol{%data<SYMBOL>} = True;
 
             @!bonds.push: %(
                 SYMBOL => .<SYMBOL>,
@@ -77,7 +78,7 @@ class NSEIndia is export {
 
     #| get-details gets symbol details.
     method get-details(Str $symbol) {
-        my IO $file = $!cache-dir.add($symbol);
+        my IO $file = $!cache-dir.add("equity").add($symbol);
         # Add details to cache if it doesn't exist.
         unless $file.f {
             my $resp = await $!client.get: ($!base-url ~ '/api/quote-equity?symbol=' ~ $symbol);
@@ -85,6 +86,18 @@ class NSEIndia is export {
         }
         return from-json slurp $file;
     }
+
+    #| latest-circular returns latest circulars from NSE API.
+    method latest-circular() {
+        my IO $file = $!cache-dir.add("latest-circular");
+        # Add details to cache if it doesn't exist.
+        unless $file.f {
+            my $resp = await $!client.get: ($!base-url ~ '/api/latest-circular');
+            spurt $file, to-json await $resp.body;
+        }
+        return from-json slurp $file;
+    }
+
 
     #| bonds is a getter function for @!bonds.
     method bonds(--> List) {

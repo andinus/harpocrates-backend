@@ -11,16 +11,20 @@ sub trading-routes(
     my NSEIndia $nse = NSEIndia.new();
 
     route {
-        get -> LoggedIn $session, 'bonds' {
+        get -> 'bonds' {
             content 'application/json', $nse.bonds();
         }
 
-        get -> LoggedIn $session, 'equity', Str $symbol {
-             if $nse.validate-symbol($symbol) {
+        get -> 'equity', Str $symbol {
+            if $nse.validate-symbol($symbol) {
                 content 'application/json', $nse.get-details($symbol);
             } else {
                 response.status = 404;
             }
+        }
+
+        get -> 'latest-circular' {
+            content 'application/json', $nse.latest-circular();
         }
     }
 }
