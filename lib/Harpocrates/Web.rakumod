@@ -8,8 +8,9 @@ use DBIish::Pool;
 
 use Harpocrates::Config;
 use Harpocrates::Routes;
+use Harpocrates::Session;
 
-sub MAIN(Bool :$debug) {
+sub MAIN() is export {
     my %config = config();
 
     my $pool = DBIish::Pool.new(
@@ -28,7 +29,7 @@ sub MAIN(Bool :$debug) {
     my Cro::Service $http = Cro::HTTP::Server.new(
         http => <1.1>,
         host => "127.0.0.1",
-        port => "5400",
+        port => 5400,
         application => routes(%config, $pool),
         before => [
                    Cro::HTTP::Session::InMemory[Harpocrates::Session].new(

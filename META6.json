@@ -6,9 +6,12 @@
     "authors" : [ "Andinus <andinus@nand.sh>" ],
     "perl" : "6.d",
     "provides" : {
-        "Harpocrates::CLI" : "lib/Harpocrates/Web.rakumod"
+        "Harpocrates::Web" : "lib/Harpocrates/Web.rakumod"
+        "Harpocrates::Session" : "lib/Harpocrates/Session.rakumod",
+        "Harpocrates::Routes" : "lib/Harpocrates/Routes.rakumod",
     },
     "depends" : [
+        "DBIish::Pool"
     ],
     "build-depends" : [ ],
     "test-depends" : [ ],
