@@ -67,10 +67,49 @@ sub routes(
         }
     }
 
+    #| verify-token takes a token string and verifies the user account
+    #| associated with that token. Returns true on successful
+    #| verification.
+    sub verify-token(Str $token --> Bool) {
+        my $connection = $pool.get-connection();
+        LEAVE .dispose with $connection;
+
+        my Bool $verified;
+        my $t = DBIish::Transaction.new(:$connection, :retry);
+        $t.in-transaction: -> $dbh {
+            my $sth = $dbh.execute(
+                'DELETE FROM users.verification
+                     WHERE token = ? AND created > (now() - interval \'15 minutes\')
+                     RETURNING account;',
+                $token
+            );
+
+            $verified = $sth.rows != 0; # Number of affected rows.
+
+            # If user was verified then add timestamp.
+            $dbh.execute(
+                'UPDATE account SET verified = ? WHERE id = ?;',
+                DateTime.now, $sth.row(:hash)<account>
+            ) if $verified;
+        }
+
+        return $verified;
+    }
 
     route {
         get -> 'ping' {
             content 'text/plain', "pong";
+        }
+
+        get -> 'account', 'verify', Str :$token! {
+            my %res;
+            if verify-token($token) {
+                %res<message> = "Email verified."
+            } else {
+                response.status = 400;
+                %res<message> = "Invalid token, Email not verified."
+            }
+            content 'application/json', %res;
         }
 
         post -> Harpocrates::Session $session, 'account', 'register' {
@@ -85,7 +124,7 @@ sub routes(
                     my Str $token = create-user-account($email, $password);
 
                     try {
-                        send-verification-email($email, $token);
+                        start send-verification-email($email, $token);
                         CATCH {
                             default {
                                 warn "[!!!] [send-verification-email]: $email" ~ $_.raku;
@@ -110,5 +149,11 @@ sub routes(
                 }
             }
         }
+
+        get -> LoggedIn $session, 'account', 'logout' {
+            $session.id = Nil;
+            response.status = 204;
+        }
+
     }
 }
