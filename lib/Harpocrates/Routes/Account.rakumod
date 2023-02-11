@@ -140,6 +140,13 @@ sub account-routes(
 
             with $sth.row(:hash)<image> {
                 spurt $image-dir.add($_), MIME::Base64.decode($image);
+
+                # Mark KYC upload as complete if aadhar upload
+                # succeeds.
+                $dbh.execute(
+                    'UPDATE users.account SET kyc_uploaded = TRUE WHERE id = ?;',
+                    $account-id
+                ) if $type eq "aadhar";
             }
         }
     }
