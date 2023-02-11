@@ -65,6 +65,20 @@ sub account-routes(
         return $sth.row(:hash);
     }
 
+    #| get-user-by-id takes id returns columns for the user. It does
+    #| not return the password.
+    sub get-user-by-id(Str $id --> Hash) {
+        my $connection = $pool.get-connection();
+        LEAVE .dispose with $connection;
+
+        my $sth = $connection.execute(
+            'SELECT id, email, contact, kyc
+                 FROM users.account WHERE id = ?;',
+            $id
+        );
+        return $sth.row(:hash);
+    }
+
     #| send-verification-email takes email, token and sents the user a
     #| verification email with the token.
     sub send-verification-email(Str $email, Str $token) {
@@ -122,11 +136,12 @@ sub account-routes(
             content 'application/json', %res;
         }
 
+        get -> LoggedIn $session, 'profile' {
+            content 'application/json', get-user-by-id($session.id);
+        }
         get -> NotLoggedIn $session, 'profile' {
             response.status = 401;
         }
-        get -> LoggedIn $session, 'profile' {
-            content 'application/json', %(email => $session.email);
         }
 
         post -> Harpocrates::Session $session, 'login' {
