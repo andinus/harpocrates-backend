@@ -83,6 +83,7 @@ sub routes(
                     response.status = 400;
                 } else {
                     my Str $token = create-user-account($email, $password);
+
                     try {
                         send-verification-email($email, $token);
                         CATCH {
@@ -96,6 +97,17 @@ sub routes(
                 }
 
                 content 'application/json', %res;
+                CATCH {
+                    when X::DBDish::DBError {
+                        if (.source-function eq "_bt_check_unique"
+                            && .constraint eq "account_email_key") {
+                            response.status = 400;
+                            content 'application/json', %(message => "Account already exists.");
+                        } else {
+                            die $_;
+                        }
+                    }
+                }
             }
         }
     }
