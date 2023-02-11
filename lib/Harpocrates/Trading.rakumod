@@ -62,14 +62,14 @@ sub settle-orders(%config, $pool --> Int) is export {
                 $dbh.execute(
                     'INSERT INTO users.transaction (account, type, symbol, quantity, price)
                              VALUES (?, ?, ?, ?, ?);',
-                    $buy<account>, 'buy', $symbol, $sell<quantity>, $sell<price>
+                    $buy<account>, 'buy', $symbol, $buy<quantity>, $sell<price>
                 );
 
                 # Add sell transaction for seller.
                 $dbh.execute(
                     'INSERT INTO users.transaction (account, type, symbol, quantity, price)
                              VALUES (?, ?, ?, ?, ?);',
-                    $sell<account>, 'sell', $symbol, $sell<quantity>, $sell<price>
+                    $sell<account>, 'sell', $symbol, $buy<quantity>, $sell<price>
                 );
 
                 # If buy order is satisfied then delete the buy order
