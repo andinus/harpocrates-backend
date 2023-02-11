@@ -36,7 +36,7 @@ class NSEIndia is export {
         my %data;
         while %data = %($parser.get_line()) {
             # Add symbol to bond-symbol.
-            %!bond-symbol{%data<SYMBOL>}{%data<SERIES>} = True;
+            %!bond-symbol{%data<SYMBOL>} = True;
 
             @!bonds.push: %(
                 SYMBOL => .<SYMBOL>,
@@ -67,6 +67,12 @@ class NSEIndia is export {
 
         # Calling API once to capture cookies.
         sink await $!client.get: $!base-url;
+    }
+
+    #| validate-symbol returns Bool indicating if symbol is present in
+    #| %!bond-symbol.
+    method validate-symbol(Str $symbol --> Bool) {
+        return %!bond-symbol{$symbol}.defined;
     }
 
     #| get-details gets symbol details.

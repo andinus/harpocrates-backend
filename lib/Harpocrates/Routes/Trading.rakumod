@@ -1,7 +1,6 @@
 use Cro::HTTP::Router;
 
 use NSEIndia;
-
 use Harpocrates::Session;
 
 #| trading-routes contains all trading related routes.
@@ -12,8 +11,16 @@ sub trading-routes(
     my NSEIndia $nse = NSEIndia.new();
 
     route {
-        get -> 'bonds' {
+        get -> LoggedIn $session, 'bonds' {
             content 'application/json', $nse.bonds();
+        }
+
+        get -> LoggedIn $session, 'equity', Str $symbol {
+             if $nse.validate-symbol($symbol) {
+                content 'application/json', $nse.get-details($symbol);
+            } else {
+                response.status = 404;
+            }
         }
     }
 }
