@@ -9,7 +9,7 @@ sub settle-orders(%config, $pool --> Int) is export {
     my $connection = $pool.get-connection();
     LEAVE .dispose with $connection;
 
-    my Int $completed-buy;
+    my Int $completed-buy = 0;
 
     # Get buy orders. Only this function works with orderbook. We
     # might add the ability to cancel orders. With this we cannot do
