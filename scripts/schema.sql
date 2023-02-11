@@ -7,10 +7,14 @@ CREATE SCHEMA users;
 CREATE TABLE IF NOT EXISTS users.account(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     created TIMESTAMP WITH TIME ZONE DEFAULT now(),
-    username TEXT NOT NULL UNIQUE,
     email TEXT NOT NULL UNIQUE,
     phone TEXT NOT NULL UNIQUE,
     password TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS users.verification(
+    account UUID NOT NULL REFERENCES users.account,
+    created TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    token UUID NOT NULL gen_random_uuid()
 );
 
 -- resource schema
