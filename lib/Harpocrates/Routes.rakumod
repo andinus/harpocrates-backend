@@ -2,6 +2,7 @@ use Cro::HTTP::Router;
 
 use Harpocrates::Session;
 use Harpocrates::Routes::NSE;
+use Harpocrates::Routes::Admin;
 use Harpocrates::Routes::Account;
 use Harpocrates::Routes::Trading;
 
@@ -20,6 +21,7 @@ sub routes(
 
         include nse => nse-routes(%config, $pool);
 
+        include admin => admin-routes(%config, $pool);
         include account => account-routes(%config, $pool);
         include trading => trading-routes(%config, $pool);
     }
