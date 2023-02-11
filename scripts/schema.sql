@@ -1,6 +1,5 @@
-CREATE TYPE kyc_type AS ENUM (
-    'aadhar', 'pan'
-);
+CREATE TYPE kyc_type AS ENUM ('aadhar', 'pan');
+CREATE TYPE transaction_type AS ENUM ('buy', 'sell');
 
 DROP SCHEMA IF EXISTS users CASCADE;
 
@@ -26,4 +25,23 @@ CREATE TABLE IF NOT EXISTS users.kyc(
     type kyc_type NOT NULL,
     id TEXT NOT NULL,
     image UUID NOT NULL UNIQUE DEFAULT gen_random_uuid()
+);
+CREATE TABLE IF NOT EXISTS users.transaction(
+    account UUID NOT NULL REFERENCES users.account,
+    created TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    type transaction_type NOT NULL,
+    symbol TEXT NOT NULL,
+    quantity INTEGER NOT NULL,
+    price DECIMAL NOT NULL
+);
+
+-- orderbook schema
+CREATE SCHEMA orderbook;
+CREATE TABLE orderbook.detail(
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    created TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    symbol TEXT NOT NULL,
+    type transaction_type NOT NULL,
+    quantity INTEGER NOT NULL,
+    price DECIMAL NOT NULL
 );
