@@ -34,7 +34,7 @@ sub settle-orders(%config, $pool --> Int) is export {
             my $sth = $dbh.execute(
                 'SELECT id, account, symbol, quantity, price, created
                      FROM orderbook.detail WHERE type = \'sell\' AND symbol = ?
-                                           AND price < ?
+                                           AND price <= ?
                      ORDER BY price, created;',
                 $symbol, $buy<price>
             );
