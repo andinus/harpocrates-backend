@@ -1,0 +1,20 @@
+{
+    "name" : "harpocrates-backend",
+    "auth" : "zef:andinus",
+    "version" : "0.1.0",
+    "description" : "Harpocrates is a bond trading platform",
+    "authors" : [ "Andinus <andinus@nand.sh>" ],
+    "perl" : "6.d",
+    "provides" : {
+        "Harpocrates::CLI" : "lib/Harpocrates/Web.rakumod"
+    },
+    "depends" : [
+    ],
+    "build-depends" : [ ],
+    "test-depends" : [ ],
+    "resources" : [ ],
+    "tags": [
+        "Harpocrates"
+    ],
+    "source-url" : "https://github.com/andinus/harpocrates-backend_Unskript-2k23"
+}

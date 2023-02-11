@@ -1,0 +1,5 @@
+lib/.precomp
+.precomp/
+.log/
+
+lib/Harpocrates/Config.rakumod
