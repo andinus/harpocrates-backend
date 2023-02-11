@@ -2,10 +2,7 @@ use Cro::HTTP::Router;
 use Cro::HTTP::Client;
 
 use MIME::Base64;
-use HTML::Escape;
-use Email::Valid;
 use DBIish::Transaction;
-use Crypt::SodiumPasswordHash;
 
 use Harpocrates::Session;
 
