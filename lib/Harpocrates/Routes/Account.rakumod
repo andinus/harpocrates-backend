@@ -199,5 +199,9 @@ sub account-routes(
             $session.id = Nil;
             response.status = 204;
         }
+        get -> NotLoggedIn $session, 'logout' {
+            response.status = 401;
+            content 'application/json', %(message => "Not logged in to any account.")
+        }
     }
 }
