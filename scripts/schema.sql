@@ -11,8 +11,9 @@ CREATE TABLE IF NOT EXISTS users.account(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     created TIMESTAMP WITH TIME ZONE DEFAULT now(),
     email TEXT NOT NULL UNIQUE,
-    phone TEXT UNIQUE,
-    password TEXT NOT NULL
+    contact TEXT NOT NULL,
+    password TEXT NOT NULL,
+    verified TIMESTAMP WITH TIME ZONE
 );
 CREATE TABLE IF NOT EXISTS users.verification(
     account UUID NOT NULL REFERENCES users.account,
