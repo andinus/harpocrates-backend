@@ -57,7 +57,7 @@ sub account-routes(
         LEAVE .dispose with $connection;
 
         my $sth = $connection.execute(
-            'SELECT id, password, verified FROM users.account WHERE email = ?;',
+            'SELECT id, type, password, verified FROM users.account WHERE email = ?;',
             $email
         );
         return $sth.row(:hash);
