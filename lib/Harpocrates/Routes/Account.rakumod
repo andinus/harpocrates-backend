@@ -66,14 +66,14 @@ sub account-routes(
     }
 
     #| get-user-by-id takes id returns columns for the user. It does
-    #| not return the password.
+    #| not return the password, id since this is meant to be sent to
+    #| the user directly.
     sub get-user-by-id(Str $id --> Hash) {
         my $connection = $pool.get-connection();
         LEAVE .dispose with $connection;
 
         my $sth = $connection.execute(
-            'SELECT id, email, contact, kyc
-                 FROM users.account WHERE id = ?;',
+            'SELECT email, contact, kyc FROM users.account WHERE id = ?;',
             $id
         );
         return $sth.row(:hash);
