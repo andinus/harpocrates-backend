@@ -5,6 +5,7 @@ use Harpocrates::Routes::NSE;
 use Harpocrates::Routes::Admin;
 use Harpocrates::Routes::Account;
 use Harpocrates::Routes::Trading;
+use Harpocrates::Routes::Portfolio;
 
 #| routes contains all routes.
 sub routes(
@@ -24,5 +25,6 @@ sub routes(
         include admin => admin-routes(%config, $pool);
         include account => account-routes(%config, $pool);
         include trading => trading-routes(%config, $pool);
+        include portfolio => portfolio-routes(%config, $pool);
     }
 }
