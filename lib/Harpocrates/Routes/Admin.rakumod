@@ -21,7 +21,8 @@ sub admin-routes(
         my $sth = $connection.execute(
             'SELECT uk.created, uk.type, uk.id, uk.image, ua.email
                  FROM users.kyc uk JOIN users.account ua ON ua.id = uk.account
-                 WHERE ua.kyc_verified = FALSE AND ua.kyc_uploaded = TRUE;',
+                 WHERE ua.kyc_verified = FALSE AND ua.kyc_uploaded = TRUE
+                 AND uk.type = \'aadhar\';',
         );
         return $sth.allrows(:array-of-hash).eager;
     }
