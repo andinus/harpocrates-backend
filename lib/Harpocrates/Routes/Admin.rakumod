@@ -19,17 +19,22 @@ sub admin-routes(
         LEAVE .dispose with $connection;
 
         my $sth = $connection.execute(
-            'SELECT id, account, symbol, quantity, price, created
-                 FROM users.verification
-                 WHERE account IN (SELECT id FROM users.account
-                                   WHERE kyc_verified = FALSE AND kyc_uploaded = TRUE);',
+            'SELECT uk.created, uk.type, uk.id, uk.image, ua.email
+                 FROM users.kyc uk JOIN users.account ua ON ua.id = uk.account
+                 WHERE ua.kyc_verified = FALSE AND ua.kyc_uploaded = TRUE;',
         );
-        return $sth.allrows(:array-of-hash);
+        return $sth.allrows(:array-of-hash).eager;
     }
 
     route {
         get -> AdminLoggedIn $session, 'unverified-kyc' {
             content 'application/json', get-unverified-kyc();
+        }
+
+        # image is a uuid that is randomly generated so we allow
+        # admins to view user's KYC.
+        get -> AdminLoggedIn $session, 'unverified-kyc', $image {
+            static $image-dir.add($image);
         }
     }
 }
