@@ -1,0 +1,52 @@
+#!/usr/bin/env raku
+
+use CSV::Parser;
+use DBIish::Pool;
+
+use Harpocrates::Config;
+
+sub MAIN() is export {
+    my %config = config();
+
+    my $pool = DBIish::Pool.new(
+        driver => 'Pg',
+        initial-size => 2,
+        max-connections => 10,
+        min-spare-connections => 2,
+        max-idle-duration => Duration.new(60),
+        |%(
+            database => %config<database><name>,
+            user => %config<database><user>,
+            password => %config<database><pass>,
+        )
+    );
+
+    # Holds current price. Generating liquidity with static data.
+    my %cur-price = %(
+        PFC => 145.35,
+        IIFL => 479.45
+    );
+
+    my $dbh = $pool.get-connection();
+    LEAVE .dispose with $dbh;
+
+    my $sth = $dbh.prepare(q{ INSERT INTO orderbook.detail (account, symbol, type, quantity, price) VALUES (?, ?, ?, ?, ?) });
+
+    # Generating large orders.
+    start {
+        loop {
+            my $enter = now;
+            for ^200 {
+                $sth.execute(
+                    'c512a2aa-a14b-486e-9be7-651e2bb44c38',
+                    <PFC IIFL>.pick, <buy sell>.pick, (20..100).pick,
+                    %cur-price{$symbol}
+                );
+            }
+            put "Generated 200 orders in " ~ (now - $enter) ~ "s";
+            sleep 8;
+        }
+    }
+
+
+}
