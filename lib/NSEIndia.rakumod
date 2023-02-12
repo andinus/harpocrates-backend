@@ -83,7 +83,7 @@ class NSEIndia is export {
     method get-details(Str $symbol) {
         my IO $file = $!cache-dir.add("equity").add($symbol);
         # Add details to cache if it doesn't exist.
-        unless $file.f or (now - $file.modified) > $!timeout {
+        unless $file.f {
             my $resp = await $!client.get: ($!base-url ~ '/api/quote-equity?symbol=' ~ $symbol);
             spurt $file, to-json await $resp.body;
         }
@@ -94,7 +94,7 @@ class NSEIndia is export {
     method latest-circular() {
         my IO $file = $!cache-dir.add("latest-circular");
         # Add details to cache if it doesn't exist.
-        unless $file.f or (now - $file.modified) > $!timeout {
+        unless $file.f {
             my $resp = await $!client.get: ($!base-url ~ '/api/latest-circular');
             spurt $file, to-json await $resp.body;
         }
