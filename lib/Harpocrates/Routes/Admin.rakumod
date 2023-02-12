@@ -45,7 +45,7 @@ sub admin-routes(
         # image is a uuid that is randomly generated so we allow
         # admins to view user's KYC.
         get -> AdminLoggedIn $session, 'unverified-kyc', $image {
-            static $image-dir.add($image);
+            content 'text/plain', $image-dir.add($image).slurp;
         }
 
         get -> AdminLoggedIn $session, 'kyc', 'verify', $email {
