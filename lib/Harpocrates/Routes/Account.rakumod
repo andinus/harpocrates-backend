@@ -126,7 +126,7 @@ sub account-routes(
     #| update-kyc takes a type, account-id, identity, image and stores
     #| them on the server. pan detail is as ID proof and aadhar is
     #| address proof. image is Base64 encoded string.
-    sub update-kyc(Str $type, Str $account-id, Str $identity, $image --> Bool) {
+    sub update-kyc(Str $type, Str $account-id, Str $identity, $image) {
         my $connection = $pool.get-connection();
         LEAVE .dispose with $connection;
 
