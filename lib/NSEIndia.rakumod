@@ -8,6 +8,9 @@ class NSEIndia is export {
     has Str $!base-url = "https://www.nseindia.com";
     has Str $!legacy-base-url = "https://www1.nseindia.com";
 
+    # timeout in seconds.
+    has Int $.timeout = 1 * 60;
+
     #| bonds contains list of all bonds symbol. This is a static list
     #| set in TWEAK.
     has Hash @!bonds;
@@ -80,7 +83,7 @@ class NSEIndia is export {
     method get-details(Str $symbol) {
         my IO $file = $!cache-dir.add("equity").add($symbol);
         # Add details to cache if it doesn't exist.
-        unless $file.f {
+        unless $file.f or (now - $file.modified) > $!timeout {
             my $resp = await $!client.get: ($!base-url ~ '/api/quote-equity?symbol=' ~ $symbol);
             spurt $file, to-json await $resp.body;
         }
@@ -91,13 +94,12 @@ class NSEIndia is export {
     method latest-circular() {
         my IO $file = $!cache-dir.add("latest-circular");
         # Add details to cache if it doesn't exist.
-        unless $file.f {
+        unless $file.f or (now - $file.modified) > $!timeout {
             my $resp = await $!client.get: ($!base-url ~ '/api/latest-circular');
             spurt $file, to-json await $resp.body;
         }
         return from-json slurp $file;
     }
-
 
     #| bonds is a getter function for @!bonds.
     method bonds(--> List) {
