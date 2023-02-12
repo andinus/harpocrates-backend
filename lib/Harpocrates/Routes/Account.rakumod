@@ -137,7 +137,7 @@ sub account-routes(
             );
 
             with $sth.row(:hash)<image> {
-                spurt %*ENV<HOME>.IO.add(%config<cryfs><dir>).add($_), MIME::Base64.decode($image);
+                spurt %*ENV<HOME>.IO.add(%config<cryfs><dir>).add($_), $image;
 
                 # Mark KYC upload as complete if aadhar upload
                 # succeeds.
