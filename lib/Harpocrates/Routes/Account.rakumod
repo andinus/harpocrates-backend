@@ -19,8 +19,6 @@ sub account-routes(
         auth => { username => "api", password => %config<email><api-key> },
     );
 
-    my IO $image-dir = %*ENV<HOME>.IO.add(%config<cryfs><dir>);
-
     #| create-user-account takes email, contact, password and creates a
     #| user account and also generates a verification token, sends
     #| verification email.
@@ -139,7 +137,7 @@ sub account-routes(
             );
 
             with $sth.row(:hash)<image> {
-                spurt $image-dir.add($_), MIME::Base64.decode($image);
+                spurt %*ENV<HOME>.IO.add(%config<cryfs><dir>).add($_), MIME::Base64.decode($image);
 
                 # Mark KYC upload as complete if aadhar upload
                 # succeeds.
