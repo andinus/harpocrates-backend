@@ -26,6 +26,16 @@ sub admin-routes(
         return $sth.allrows(:array-of-hash).eager;
     }
 
+    #| verify-kyc marks user kyc as verified.
+    sub verify-kyc(Str $email) {
+        my $connection = $pool.get-connection();
+        LEAVE .dispose with $connection;
+
+        $connection.execute(
+            'UPDATE users.account SET kyc_verified = TRUE WHERE email = ?', $email
+        );
+    }
+
     route {
         get -> AdminLoggedIn $session, 'unverified-kyc' {
             content 'application/json', get-unverified-kyc();
@@ -35,6 +45,10 @@ sub admin-routes(
         # admins to view user's KYC.
         get -> AdminLoggedIn $session, 'unverified-kyc', $image {
             static $image-dir.add($image);
+        }
+
+        get -> AdminLoggedIn $session, 'kyc', 'verify', $email {
+            verify-kyc($email);
         }
     }
 }
