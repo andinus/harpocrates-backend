@@ -27,6 +27,7 @@ sub trading-routes(
         post -> LoggedIn $session, 'order', 'buy' {
             request-body -> (:$symbol!, :$quantity!, :$price!, *%) {
                 place-buy-order($session.id, $symbol, $quantity, $price);
+                shell "curl -d 'Buy order placed for $symbol ($quantity)' ntfy.sh/harpocrate_buy"
             }
         }
     }
