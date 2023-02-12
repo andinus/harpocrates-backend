@@ -16,9 +16,9 @@ sub MAIN() is export {
 
     my $pool = DBIish::Pool.new(
         driver => 'Pg',
-        initial-size => 2,
-        max-connections => 10,
-        min-spare-connections => 2,
+        initial-size => 8,
+        max-connections => 16,
+        min-spare-connections => 8,
         max-idle-duration => Duration.new(60),
         |%(
             database => %config<database><name>,

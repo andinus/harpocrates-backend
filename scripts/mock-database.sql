@@ -15,11 +15,11 @@ INSERT INTO users.account (id, email, contact, password, verified)
     );
 
 INSERT INTO orderbook.detail (account, symbol, type, quantity, price)
-    VALUES ('c512a2aa-a14b-486e-9be7-651e2bb44c38', 'HARPOCRATES', 'sell', 100, 20.30),
-           ('c512a2aa-a14b-486e-9be7-651e2bb44c38', 'HARPOCRATES', 'sell', 100, 20.25),
-           ('c512a2aa-a14b-486e-9be7-651e2bb44c38', 'HARPOCRATES', 'sell', 200, 20.30),
-           ('c512a2aa-a14b-486e-9be7-651e2bb44c38', 'HARPOCRATES', 'buy', 250, 20.25),
-           ('c512a2aa-a14b-486e-9be7-651e2bb44c38', 'AAPL', 'sell', 100, 20.30),
-           ('c512a2aa-a14b-486e-9be7-651e2bb44c38', 'AAPL', 'sell', 100, 20.25),
-           ('c512a2aa-a14b-486e-9be7-651e2bb44c38', 'AAPL', 'sell', 200, 20.30),
-           ('c512a2aa-a14b-486e-9be7-651e2bb44c38', 'AAPL', 'buy', 250, 20.25);
+    VALUES ('c512a2aa-a14b-486e-9be7-651e2bb44c38', 'NHAI', 'sell', 100, 1135.49),
+           ('c512a2aa-a14b-486e-9be7-651e2bb44c38', 'NHAI', 'sell', 100, 1134.30),
+           ('c512a2aa-a14b-486e-9be7-651e2bb44c38', 'NHAI', 'sell', 200, 1130),
+           ('c512a2aa-a14b-486e-9be7-651e2bb44c38', 'NHAI', 'buy', 250, 1150),
+           ('c512a2aa-a14b-486e-9be7-651e2bb44c38', 'HUDCO', 'sell', 100, 46.85),
+           ('c512a2aa-a14b-486e-9be7-651e2bb44c38', 'HUDCO', 'sell', 100, 45.8),
+           ('c512a2aa-a14b-486e-9be7-651e2bb44c38', 'HUDCO', 'sell', 200, 45.3),
+           ('c512a2aa-a14b-486e-9be7-651e2bb44c38', 'HUDCO', 'buy', 250, 46);
