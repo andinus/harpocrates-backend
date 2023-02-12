@@ -16,9 +16,6 @@ sub routes(
         get -> 'ping' {
             content 'text/plain', "pong";
         }
-        get -> 'life' {
-            response.status = 404;
-        }
 
         include nse => nse-routes(%config, $pool);
 
