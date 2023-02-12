@@ -10,9 +10,9 @@ sub MAIN() is export {
 
     my $pool = DBIish::Pool.new(
         driver => 'Pg',
-        initial-size => 2,
-        max-connections => 10,
-        min-spare-connections => 2,
+        initial-size => 1,
+        max-connections => 2,
+        min-spare-connections => 1,
         max-idle-duration => Duration.new(60),
         |%(
             database => %config<database><name>,
@@ -33,20 +33,18 @@ sub MAIN() is export {
     my $sth = $dbh.prepare(q{ INSERT INTO orderbook.detail (account, symbol, type, quantity, price) VALUES (?, ?, ?, ?, ?) });
 
     # Generating large orders.
-    start {
-        loop {
-            my $enter = now;
-            for ^200 {
-                $sth.execute(
-                    'c512a2aa-a14b-486e-9be7-651e2bb44c38',
-                    <PFC IIFL>.pick, <buy sell>.pick, (20..100).pick,
-                    %cur-price{$symbol}
-                );
-            }
-            put "Generated 200 orders in " ~ (now - $enter) ~ "s";
-            sleep 8;
+    loop {
+        my $enter = now;
+        my $rand = (1...8).pick;
+        for ^$rand {
+            my Str $symbol = <PFC IIFL>.pick;
+            $sth.execute(
+                'c512a2aa-a14b-486e-9be7-651e2bb44c38',
+                $symbol, <buy sell>.pick, (20..100).pick,
+                %cur-price{$symbol}
+            );
         }
+        put "Generated $rand orders in " ~ (now - $enter) ~ "s";
+        sleep 0.1;
     }
-
-
 }

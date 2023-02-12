@@ -32,7 +32,7 @@ sub portfolio-routes(
         );
         my @data = $sth.allrows(:array-of-hash);
         for @data.kv -> $k, $v {
-            @data[$k]<current_price> = $nse.get-details($v<symbol>)<priceInfo><lastPrice> * $v<quantity>;
+            @data[$k]<current_price> = $nse.get-details($v<symbol>)<priceInfo><lastPrice>;
         }
         return @data;
     }
